@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Tracking - The Navigation</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #0b5ed7;
+            --dark-color: #212529;
+            --light-color: #ffffff;
+            --background-light: #f1f1f1;
+            --red-card: #cf2141;
+            --blue-card: #3b82f6;
+            --green-card: #22c55e;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        /* 🔄 Global Reset & Body */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--light-color);
+            padding-top: 55px;
+            scroll-padding-top: 55px;
+            transition: all 0.3s ease;
+        }
+
+        /* 🚀 NAVBAR */
+        nav {
+            background-color: var(--dark-color);
+            height: 55px;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        nav .brand {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--light-color);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            margin-left: auto;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            font-weight: 400;
+            transition: 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        nav ul li a:hover {
+            color: var(--light-color);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+            left: 0;
+            right: auto;
+        }
+
+        /* 🏠 Hero Section */
+        .background {
+            background: linear-gradient(to bottom, rgba(73, 136, 155, 0.2), rgba(92, 92, 88, 0));
+            min-height: calc(100vh - 55px);
+            padding: 50px 0;
+            position: relative;
+        }
+
+        .container {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+        .sub-container {
+            padding: 40px 20px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card-icons {
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: var(--light-color);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-icons img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        .font-home {
+            font-size: clamp(30px, 5vw, 56px);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .font {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(20px, 3vw, 36px);
+            font-weight: 400;
+            color: #555;
+            margin-bottom: 40px;
+        }
+
+        .font span {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Tombol Utama */
+        .btn-custom {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 110, 255, 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .btn-custom:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 110, 255, 0.3);
+        }
+
+        .btn-custom:active {
+            background-color: #0a58ca;
+            transform: translateY(0);
+        }
+
+        /* 📖 About Section */
+        .background-page2 {
+            background-color: var(--background-light);
+            padding: 80px 5%;
+            min-height: 400px;
+        }
+
+        .about-content {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .about-project {
+            font-size: clamp(30px, 4vw, 40px);
+            font-weight: 700;
+            color: var(--dark-color);
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .about-project::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .text-about {
+            margin-top: 30px;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #444;
+            min-height: 100px;
+        }
+
+        /* 👥 TEAM SECTION (FOKUS PERBAIKAN) */
+        .background-page3 {
+            padding: 80px 5%;
+            /* Padding yang baik */
+            min-height: 500px;
+            text-align: center;
+            /* Memastikan judul rata tengah */
+        }
+
+        .team {
+            font-size: clamp(28px, 3.5vw, 36px);
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+
+        .team::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        /* Kartu Tim: Menggunakan Grid untuk tata letak yang rapi */
+        .cards {
+            position: relative;
+            top: 50px;
+            display: grid;
+            /* Menggunakan Grid */
+            /* Membuat 3 kolom di desktop, responsif ke 1 kolom di mobile */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            /* Jarak antar kartu */
+            max-width: 1000px;
+            /* Lebar maksimum kontainer kartu */
+            margin: 0 auto;
+            /* Tengah kontainer */
+            padding-bottom: 50px;
+        }
+
+        .cards .card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 30px 20px;
+            min-height: 280px;
+            /* Menambah tinggi agar lebih leluasa */
+            border-radius: 15px;
+            color: var(--light-color);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Definisi Warna Kartu */
+        .cards .red {
+            background-color: var(--red-card);
+        }
+
+        .cards .blue {
+            background-color: var(--blue-card);
+        }
+
+        .cards .green {
+            background-color: var(--green-card);
+        }
+
+        /* Gaya Gambar Anggota Tim */
+        .cards .card img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            object-fit: cover;
+            border: 4px solid var(--light-color);
+            /* Border putih tebal */
+        }
+
+        .cards .card .tip {
+            font-size: 1.3em;
+            /* Nama lebih besar */
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .cards .card .second-text {
+            font-size: .9em;
+            font-weight: 300;
+            margin-bottom: 25px;
+            /* Jarak ke tombol */
+        }
+
+        /* Tombol di dalam kartu (disesuaikan agar berbeda dari tombol utama) */
+        .cards .card .btn-custom {
+            padding: 10px 20px;
+            font-size: 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            /* Transparan */
+            box-shadow: none;
+            border-radius: 5px;
+            /* Bentuk kotak lebih kecil */
+        }
+
+        .cards .card .btn-custom:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: none;
+            /* Nonaktifkan efek lift untuk tombol di dalam card */
+        }
+
+        /* Efek Hover untuk Kartu */
+        .cards .card:hover {
+            transform: translateY(-10px);
+            /* Efek lift-up */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Efek blur pada kartu lain saat hover */
+        .cards:hover>.card:not(:hover) {
+            filter: blur(2px) grayscale(50%);
+            opacity: 0.8;
+            transform: none;
+        }
+
+        /* Navbar Menu Button (Hanya terlihat di mobile) */
+        #menuBtn {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            display: none;
+            /* Default tersembunyi */
+        }
+
+        #menuBtn div {
+            width: 25px;
+            height: 3px;
+            background-color: var(--light-color);
+            margin: 4px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        /* 📱 MEDIA QUERY: Mobile/Tablet */
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 3%;
+            }
+
+            nav ul {
+                position: fixed;
+                top: 55px;
+                right: 0;
+                background: var(--dark-color);
+                width: 200px;
+                flex-direction: column;
+                padding: 15px;
+                display: none;
+                border-bottom-left-radius: 10px;
+                z-index: 999;
+                box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
+                transform: translateX(100%);
+                transition: transform 0.3s ease-out;
+            }
+
+            nav ul.show {
+                display: flex;
+                transform: translateX(0);
+            }
+
+            nav ul li a {
+                padding: 10px 0;
+                display: block;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            #menuBtn {
+                display: block;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn-custom {
+                width: 80%;
+                margin: 0 auto;
+            }
+
+            /* Perbaikan fokus di mobile */
+            .background-page3 {
+                padding: 60px 3%;
+                /* Padding lebih kecil di mobile */
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+                /* Satu kolom di mobile */
+                top: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <h2 class="brand">🚩The Navigation</h2>
+
+        <button id="menuBtn">
+            <div></div>
+            <div></div>
+            <div></div>
+        </button>
+
+        <ul id="menu">
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="#about-section">About</a></li>
+            <li><a href="#view-team">Team</a></li>
+        </ul>
+    </nav>
+
+    <section class="background">
+        <div class="container">
+            <div class="sub-container">
+                <div class="card-icons">
+
+
+                    [Image of GPS navigation icon]
+
+                </div>
+
+                <h2 class="font-home">Welcome to the web GPS tracker</h2>
+                <div class="font">
+                    Our team name is
+                    <span class="font-arch">The Navigation</span>
+                </div>
+
+                <div class="button-group">
+                    <a href="#about-section" class="btn-custom">
+                        About Project
+                    </a>
+                    <a href="#view-team" class="btn-custom">
+                        View Team
+                    </a>
+                </div>
+            </div>
+        </div>
+        <footer>
+        </footer>
+    </section>
+
+    <section class="background-page2" id="about-section">
+        <div class="about-content">
+            <h2 class="about-project">About The Project</h2>
+            <p class="text-about">
+                Proyek web GPS tracker ini dirancang untuk menyediakan solusi pelacakan lokasi secara *real-time* yang
+                efisien dan mudah digunakan. Kami memanfaatkan teknologi **Geolokasi** dan API peta modern (seperti
+                Leaflet) untuk memvisualisasikan data lokasi dengan akurat. Tujuannya adalah untuk membantu pengguna
+                memantau aset atau perangkat bergerak dengan antarmuka yang intuitif dan responsif. Konten ini akan
+                menjelaskan fitur-fitur inti, teknologi yang digunakan, dan manfaat yang ditawarkan oleh aplikasi ini.
+            </p>
+        </div>
+    </section>
+
+    <section class="background-page3" id="view-team">
+        <div style="text-align: center; padding-bottom: 30px;">
+            <h2 class="team">We Are The Navigation</h2>
+        </div>
+
+        <div class="cards">
+            <div class="card red">
+                <img src="https://via.placeholder.com/90/ffffff/cf2141?text=FN" alt="Furqon Nailul Huda Avatar">
+                <p class="tip">Furqon Nailul Huda</p>
+                <p class="second-text">Project Lead & Backend Developer</p>
+                <a href="#" class="btn-custom">Contact Info</a>
+            </div>
+            <div class="card blue">
+                <img src="https://via.placeholder.com/90/ffffff/3b82f6?text=AS" alt="Ammar Bassam Setiawan Avatar">
+                <p class="tip">Ammar Bassam Setiawan</p>
+                <p class="second-text">Frontend & UI/UX Specialist</p>
+                <a href="#" class="btn-custom">Contact Info</a>
+            </div>
+            <div class="card green">
+                <img src="https://via.placeholder.com/90/ffffff/22c55e?text=DA" alt="Dhabit Abdilah Adibraja Avatar">
+                <p class="tip">Dhabit Abdilah Adibraja</p>
+                <p class="second-text">Database & Infrastructure Engineer</p>
+                <a href="#" class="btn-custom">Contact Info</a>
+            </div>
+        </div>
+    </section>
+
+
+    <div id="content"></div>
+    <script>
+        const btn = document.getElementById("menuBtn");
+        const menu = document.getElementById("menu");
+
+        btn.addEventListener("click", () => {
+            // Menggunakan class 'show' untuk menampilkan/menyembunyikan menu
+            menu.classList.toggle('show');
+        });
+
+        // Menutup menu saat link di klik (khusus mobile)
+        document.querySelectorAll('#menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                // Hanya tutup jika tampilan adalah mobile (misalnya, jika menu ditampilkan sebagai dropdown)
+                if (window.innerWidth <= 768) {
+                    menu.classList.remove('show');
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
